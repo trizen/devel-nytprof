@@ -39,6 +39,9 @@ use File::Spec;
 use File::Which qw(which);
 use File::Path qw(rmtree);
 
+use Perl::Tokenizer qw(perl_tokens);
+use HTML::Entities qw(encode_entities);
+
 # Handle --profself before loading Devel::NYTProf::Core
 # (because it parses NYTPROF for options)
 BEGIN {
@@ -47,7 +50,7 @@ BEGIN {
         our $profself = "nytprof-nytprofhtml.out";
         $ENV{NYTPROF} .= ":file=$profself:trace=1";
         require Devel::NYTProf;
-        END { warn "Profile of $0 written to $profself\n" if our $profself; } 
+        END { warn "Profile of $0 written to $profself\n" if our $profself; }
     }
 }
 
@@ -546,11 +549,24 @@ sub _escape_html {
     return $_;
 }
 
+sub highlight_code {
+    my ($code) = @_;
+
+    my $html = '';
+
+    perl_tokens {
+        my ($token, $from, $to) = @_;
+        $html .= qq{<span class="$token">} . encode_entities(substr($code, $from, $to - $from)) . '</span>';
+    } $code;
+
+    $html;
+}
 
 sub report_src_line {
     my ($value, undef, $linesrc, $profile, $fi, $stats_for_line) = @_;
 
-    $linesrc = _escape_html($linesrc);
+    #$linesrc = _escape_html($linesrc);
+    $linesrc = highlight_code($linesrc);
 
     our $inc_path_regex ||= get_abs_paths_alternation_regex([$profile->inc]);
 
@@ -912,19 +928,19 @@ sub js_for_new_treemap {
         offset => 0, # (0/2/4) extra padding around nested levels
 
         Color => {
-            allow => 1,  
+            allow => 1,
             # value range for the $color property
-            minValue => 0,  
-            maxValue => scalar @treemap_colors,  
+            minValue => 0,
+            maxValue => scalar @treemap_colors,
             # corresponding color range [R,G,B]:
-            minColorValue => [0, 255, 50],  
+            minColorValue => [0, 255, 50],
             maxColorValue => [255, 0, 50],
         },
 
-        Tips => {  
+        Tips => {
             allow => 1,
-            offsetX => 20,  
-            offsetY => 20,  
+            offsetX => 20,
+            offsetY => 20,
         },
 
         selectPathOnHover => 1, # adds "over-<foo>" css class to elements
@@ -939,30 +955,30 @@ sub js_for_new_treemap {
         function init_$name() {
             var tm_args = $new_args_json;
 
-            //This method is invoked when a DOM element is created.  
-            //Its useful to set DOM event handlers here or manipulate  
-            //the DOM Treemap nodes.  
-            tm_args.onCreateElement = function(content, tree, isLeaf, leaf){  
+            //This method is invoked when a DOM element is created.
+            //Its useful to set DOM event handlers here or manipulate
+            //the DOM Treemap nodes.
+            tm_args.onCreateElement = function(content, tree, isLeaf, leaf){
                 //Add background image for cushion effect
-                if(isLeaf) { 
-                    var style = leaf.style,   
-                    width = parseInt(style.width) - 2,   
-                    height = parseInt(style.height) - 2;  
+                if(isLeaf) {
+                    var style = leaf.style,
+                    width = parseInt(style.width) - 2,
+                    height = parseInt(style.height) - 2;
                     // don't add gradient if too small to be worth the cost
                     if (width < 10 || height < 10) {   // is narrow
                         if (width < 50 && height < 50) // is small
                             return;
                     }
-                    leaf.innerHTML = tree.name +   
-                        "<img src=\\"js/jit/gradient-cushion1.png\\" " +  
-                        " style=\\"position:absolute;top:0;left:0;width:" +   
-                        width+"px;height:" + height+"px;\\" />";  
-                    style.width = width + "px";  
-                    style.height = height + "px";  
-                }  
+                    leaf.innerHTML = tree.name +
+                        "<img src=\\"js/jit/gradient-cushion1.png\\" " +
+                        " style=\\"position:absolute;top:0;left:0;width:" +
+                        width+"px;height:" + height+"px;\\" />";
+                    style.width = width + "px";
+                    style.height = height + "px";
+                }
             };
 
-            // add content to the tooltip when a node is hovered  
+            // add content to the tooltip when a node is hovered
             // move to separate function later
             tm_args.Tips.onShow = function(tip, node, isLeaf, domElement) {
                 tip.innerHTML = node.data.tip;
@@ -1198,7 +1214,7 @@ sub output_subs_callgraph_dot_file {
         next if $sub_filter and not $sub_filter->($si, undef);
 
         my $called_by_subnames = $si->called_by_subnames;
-        if (!%$called_by_subnames) { 
+        if (!%$called_by_subnames) {
             warn sprintf "%s has no caller subnames but a call count of %d\n",
                     $subname, $si->calls;
             next;
@@ -1321,7 +1337,8 @@ sub _copy_dir {
 sub open_browser_on {
     my $index = shift;
 
-    return if eval { require Browser::Open; Browser::Open::open_browser($index, 1); };
+    my $exit_code = eval { require Browser::Open; Browser::Open::open_browser($index, 1); };
+    return if defined($exit_code) && $exit_code == 0;
     warn "$@\n" if $@ && $opt_debug;
 
     return if eval { require ActiveState::Browser; ActiveState::Browser::open($index); 1 };
@@ -1408,7 +1425,7 @@ sub output_file_table {
     @fis = sort { $b->meta->{'time'} <=> $a->meta->{'time'} } @fis;
 
     my $dev_time = calculate_median_absolute_deviation([map { scalar $_->meta->{'time'} } @fis], 1);
-    
+
     foreach my $fi (@fis) {
         my $meta = $fi->meta;
         my $fid = $fi->fid;
@@ -1644,6 +1661,60 @@ This file was generated by Devel::NYTProf version $Devel::NYTProf::Core::VERSION
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta http-equiv="Content-Language" content="en-us" />
     <meta name="robots" content="noindex,nofollow" />
+    <style type="text/css">
+    /*<![CDATA[*/
+    <!--
+    pre { color: #000000;
+          background: #FFFFFF;
+          font-family: monospace;
+        }
+
+    .dereference_operator  { color: #1800ff; }
+    .fat_comma             { color: #1800ff; }
+    .assignment_operator   { color: #1800ff; }
+    .comma                 { color: #1800ff; }
+    .operator              { color: #1800ff; }
+    .comment               { color: #676767; }
+    .number                { color: #ff0000; }
+    .binary_number         { color: #ff0000; }
+    .hex_number            { color: #ff0000; }
+    .v_string              { color: #ff0000; }
+    .heredoc_beg           { color: #CD5555; font-weight:bold; }
+    .heredoc               { color: #CD5555; font-style:italic; }
+    .keyword               { color: #317cd4; font-weight:bold; }
+    .file_test             { color: #317cd4; font-weight:bold; }
+    .special_keyword       { color: #317cd4; font-weight:bold; }
+    .bare_word             { color: #000000; }
+    .semicolon             { color: #000000; font-weight:bold; }
+    .sub_name              { color: #ff547c; font-weight:bold; }
+    .sub_proto             { color: #148f14; font-style:italic; }
+    .scalar_sigil          { color: #006f27; font-weight:bold; }
+    .array_sigil           { color: #006f27; font-weight:bold; }
+    .hash_sigil            { color: #006f27; font-weight:bold; }
+    .glob_sigil            { color: #006f27; font-weight:bold; }
+    .ampersand_sigil       { color: #006f27; font-weight:bold; }
+    .qq_string             { color: #1800ff; font-weight:bold; }
+    .q_string              { color: #1800ff; font-weight:bold; }
+    .double_quoted_string  { color: #1800ff; font-weight:bold; }
+    .single_quoted_string  { color: #1800ff; font-weight:bold; }
+    .match_regex           { color: #ff6136; font-weight:bold; }
+    .compiled_regex        { color: #296aef; font-weight:bold; }
+    .transliteration       { color: #c6b34d; font-weight:bold; }
+    .substitution          { color: #737400; font-weight:bold; }
+    .backtick              { color: #b91be0; font-weight:bold; }
+    .qx_string             { color: #b91be0; font-weight:bold; }
+    .var_name              { color: #006f27; font-weight:bold; }
+    .special_var_name      { color: #006f27; font-weight:bold; }
+    .pod                   { color: #228B22; font-style:italic; }
+    .qw_string             { color: #148f14; font-weight:bold; }
+    .glob_readline         { color: #e31620; font-weight:bold; }
+    .data                  { color: #747474; font-style:italic; }
+    .format                { color: #7283ff; font-style:italic; }
+
+    -->
+    /*]]>*/
+    </style>
+
     <title>$title</title>
 EOD
 
@@ -1740,7 +1811,7 @@ sub get_page_header {
     push @body_attribs, qq{onload="$args{body_onload}"} if $args{body_onload};
     my $body_attribs = join "; ", @body_attribs;
 
-    return qq{<body $body_attribs> 
+    return qq{<body $body_attribs>
 <div class="header" style="position: relative; overflow-x: hidden; overflow-y: hidden; z-index: 0; ">
 $back_link
 <div class="headerForeground" style="float: left">
@@ -1827,13 +1898,13 @@ body { font-family: sans-serif; margin: 0px; background-color: white; color:#222
 .siteTitle { font-size: 2em; }
 .siteSubTitle { font-size: 1.2em; }
 
-.header_back { 
-    position: absolute; 
+.header_back {
+    position: absolute;
     padding: 10px;
 }
 .header_back > a:link,
 .header_back > a:visited {
-    color: white; 
+    color: white;
     text-decoration: none;
     font-size: 0.75em;
 }
@@ -1849,14 +1920,14 @@ body { font-family: sans-serif; margin: 0px; background-color: white; color:#222
 }
 .footer { margin: 30px; }
 
-table { 
-    border-collapse: collapse; 
-    border-spacing: 0px; 
+table {
+    border-collapse: collapse;
+    border-spacing: 0px;
     margin-top: 20px;
 }
-tr { 
+tr {
     text-align : center;
-    vertical-align: top; 
+    vertical-align: top;
 }
 th,.h {
     background-color: #dddddd;
@@ -1864,8 +1935,8 @@ th,.h {
     padding: 0em 0.4em 0em 0.4em;
     font-size:0.8em;
 }
-td { 
-    border: solid 1px #cccccc; 
+td {
+    border: solid 1px #cccccc;
     padding: 0em 0.4em 0em 0.4em;
 }
 caption {
@@ -1982,7 +2053,7 @@ multiple files. See L<Devel::NYTProf> and L<nytprofmerge>.)
 
 The reports include dynamic runtime analysis wherein each line and each file
 is analyzed based on the performance of the other lines and files.  As a
-result, you can quickly find the slowest module and the slowest line in a 
+result, you can quickly find the slowest module and the slowest line in a
 module.  Slowness is measured in three ways: total calls, total time, and
 average time per call.
 
