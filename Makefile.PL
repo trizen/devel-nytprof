@@ -164,6 +164,8 @@ WriteMakefile(
         'XSLoader'     => 0,
         'Getopt::Long' => 0,
         'JSON::MaybeXS' => 0,
+        'Perl::Tokenizer' => 0,
+        'HTML::Entities' => 0,
     },
     LIBS      => [join ' ', @libs],
     OBJECT    => q/$(O_FILES)/,
