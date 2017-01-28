@@ -39,6 +39,7 @@ use File::Spec;
 use File::Which qw(which);
 use File::Path qw(rmtree);
 
+use Encode qw(decode_utf8);
 use Perl::Tokenizer qw(perl_tokens);
 use HTML::Entities qw(encode_entities);
 
@@ -566,7 +567,7 @@ sub report_src_line {
     my ($value, undef, $linesrc, $profile, $fi, $stats_for_line) = @_;
 
     #$linesrc = _escape_html($linesrc);
-    $linesrc = highlight_code($linesrc);
+    $linesrc = highlight_code(decode_utf8($linesrc));
 
     our $inc_path_regex ||= get_abs_paths_alternation_regex([$profile->inc]);
 

@@ -166,6 +166,7 @@ WriteMakefile(
         'JSON::MaybeXS' => 0,
         'Perl::Tokenizer' => 0,
         'HTML::Entities' => 0,
+        'Encode' => 0,
     },
     LIBS      => [join ' ', @libs],
     OBJECT    => q/$(O_FILES)/,
