@@ -1338,13 +1338,14 @@ sub _copy_dir {
 sub open_browser_on {
     my $index = shift;
 
+    $index = File::Spec->rel2abs($index);
+
     my $exit_code = eval { require Browser::Open; Browser::Open::open_browser($index, 1); };
     return if defined($exit_code) && $exit_code == 0;
     warn "$@\n" if $@ && $opt_debug;
 
     return if eval { require ActiveState::Browser; ActiveState::Browser::open($index); 1 };
     warn "$@\n" if $@ && $opt_debug && $^O eq "MSWin32";
-
 
     my $BROWSER;
     if ($^O eq "MSWin32") {
@@ -1359,7 +1360,7 @@ sub open_browser_on {
             push(@try, split(/:/, $ENV{BROWSER}));
         }
         else {
-            push(@try, qw(firefox galeon mozilla opera netscape));
+            push(@try, qw(brave firefox galeon mozilla opera netscape));
         }
         unshift(@try, "kfmclient") if $ENV{KDE_FULL_SESSION};
         unshift(@try, "gnome-open") if $ENV{GNOME_DESKTOP_SESSION_ID};
