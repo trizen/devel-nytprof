@@ -65,7 +65,7 @@ use Devel::NYTProf::Util qw(
 );
 use Devel::NYTProf::Constants qw(NYTP_SCi_CALLING_SUB);
 
-our $VERSION = '6.04';
+our $VERSION = '6.05';
 
 if ($VERSION != $Devel::NYTProf::Core::VERSION) {
     die "$0 version '$VERSION' doesn't match version '$Devel::NYTProf::Core::VERSION' of $INC{'Devel/NYTProf/Core.pm'}\n";
@@ -2184,7 +2184,7 @@ Tim's work was partly sponsored by Shopzilla. L<http://www.shopzilla.com>.
 
 Mailing list and discussion at L<http://groups.google.com/group/develnytprof-dev>
 
-Public SVN Repository and hacking instructions at L<http://code.google.com/p/perl-devel-nytprof/>
+Public Github Repository and hacking instructions at L<https://github.com/timbunce/devel-nytprof/>
 
 L<Devel::NYTProf>,
 L<Devel::NYTProf::Reader>,
