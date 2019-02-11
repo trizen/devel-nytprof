@@ -2,10 +2,10 @@
 
 Devel::NYTProf is a powerful feature-rich source code profiler for Perl 5.
 
-This is a fork with support for syntax-highlighting.
+This is a fork with support for syntax-highlighting, using [Perl::Tokenizer](https://metacpan.org/pod/Perl::Tokenizer).
 
-For the official version, pleasee see:
- 
+For the official version, please see:
+
 * https://github.com/timbunce/devel-nytprof
 
 [![Build Status](https://secure.travis-ci.org/timbunce/devel-nytprof.png)](http://travis-ci.org/timbunce/devel-nytprof)
@@ -30,4 +30,3 @@ To build and install, just incant the typical mantra:
      make
      make test
      make install
-
