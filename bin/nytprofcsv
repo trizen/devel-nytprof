@@ -16,7 +16,7 @@ use Getopt::Long;
 
 use Devel::NYTProf::Reader;
 
-our $VERSION = '6.07';
+our $VERSION = '6.08';
 
 use constant NUMERIC_PRECISION => 5;
 
@@ -76,15 +76,15 @@ $reporter->set_param(mk_report_source_line => sub {
     $line =~ s/^\s*//; # trim leading spaces
     my $delim = $opt{delim};
 
-    my $time  = $stats_for_line->{'time'} || 0;
-    my $calls = $stats_for_line->{'calls'} || 0;
-    $time  += $stats_for_line->{evalcall_stmts_time_nested} || 0;
-    #$calls ||= 1 if exists $stats_for_line->{evalcall_stmts_time_nested};
+	my $time  = $stats_for_line->{'time'} || 0;
+	my $calls = $stats_for_line->{'calls'} || 0;
+	$time  += $stats_for_line->{evalcall_stmts_time_nested} || 0;
+	#$calls ||= 1 if exists $stats_for_line->{evalcall_stmts_time_nested};
 
     my $text = sprintf("%f%s%g%s%f%s%s\n",
         $time, $delim,
         $calls, $delim,
-        ($calls) ? $time/$calls : 0, $delim,
+		($calls) ? $time/$calls : 0, $delim,
         $line,
     );
     return $text unless $opt{annotated};
@@ -145,7 +145,7 @@ B<nytprofcsv is deprecated and will be removed in a future release.>
 =head1 DESCRIPTION
 
 C<nytprofcsv> is a script that implements L<Devel::NYTProf::Reader> to
-create comma-seperated value formatted reports from L<Devel::NYTProf>
+create comma-separated value formatted reports from L<Devel::NYTProf>
 databases.
 
 See the L<Devel::NYTProf> Perl code profiler for more information.
@@ -188,9 +188,9 @@ Print the help message
  0.00360,3,0.0012,use HTML::Entities;
  0.00212,3,0.000706666666666667,use Encode;
  0.00248,3,0.000826666666666667,use utf8;
- 0.00468,3,0.00156,use strict;
+ 0.00468,3,0.00156,use strict; 
  0,0,0,
- 0.00000,1,0,require Exporter;
+ 0.00000,1,0,require Exporter; 
  ... that's enough, get the picture? ...
 
 Note: The format line indicates what fields the numbers correspond to
