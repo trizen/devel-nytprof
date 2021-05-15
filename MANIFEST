@@ -2,7 +2,6 @@
 .gitignore
 .indent.pro
 .perltidyrc
-.travis.yml
 bin/flamegraph.pl
 bin/nytprofcalls
 bin/nytprofcg
@@ -10,7 +9,6 @@ bin/nytprofcsv
 bin/nytprofhtml
 bin/nytprofmerge
 bin/nytprofpf
-change-version.sh
 Changes
 demo/1m_stmts.pl
 demo/closure.pl
