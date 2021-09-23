@@ -30,3 +30,4 @@ To build and install, just incant the typical mantra:
      make
      make test
      make install
+
