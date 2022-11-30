@@ -141,14 +141,15 @@ $mm_opts{PREREQ_PM} = {
     'XSLoader'     => 0,
     'Getopt::Long' => 0,
     'JSON::MaybeXS' => 0,
-        'Perl::Tokenizer' => 0,
-        'HTML::Entities' => 0,
-        'Encode' => 0,
+    'Perl::Tokenizer' => 0,
+    'HTML::Entities' => 0,
+    'Encode' => 0,
 };
 $mm_opts{TEST_REQUIRES} = {
     'Test::More'   => '0.84',
     'Test::Differences' => '0.60',
     'Capture::Tiny' => 0,
+    'Sub::Name' => '0.11',
 };
 
 $mm_opts{BUILD_REQUIRES} = {
@@ -263,20 +264,6 @@ slowops::
 	    -e 'print "PL_ppaddr[OP_\U$$_\E] = pp_slowop_profiler;\n" for sort @ops;' \
 	    > slowops.h
 	$(PERL) -e "warn qq{NOTE: slowops.h will need manual editing to restore lost #ifdef's around some opcodes!\n}";
-
-svnmanifest::
-	svn list -R .@HEAD | sort | grep -v '/$$' > MANIFEST
-	svn diff MANIFEST
-
-checkkeywords:
-	$(RM_RF) blib
-	find .  \( -name .svn -prune -or -name t -prune -or -name \*.pm -or -name \*.PL -or -name \*.pl \) -type f \
-	    -exec bash -c '[ "$$(svn pg svn:keywords {})" != "Id Revision Date" ] && echo svn propset svn:keywords \"Id Revision Date\" {}' \;
-
-checkpod:
-	$(RM_RF) blib
-	find . -type f \( -name .svn -prune -o -name \*.pm -o -name \*.PL -o -name \*.pl \) \
-	    -exec podchecker {} \; 2>&1 | grep -v "pod syntax OK"
 
 PERLTIDY=perltidy --profile=.perltidyrc -nst -b
 perltidy:
