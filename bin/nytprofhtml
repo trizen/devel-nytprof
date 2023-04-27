@@ -550,17 +550,33 @@ sub _escape_html {
     return $_;
 }
 
-sub highlight_code {
-    my ($code) = @_;
+{
+    my %highlight_tokens;
 
-    my $html = '';
+    @highlight_tokens{
+        get_html_header() =~ m{^\h*\.(\w+)}gm
+    } = ();
 
-    perl_tokens {
-        my ($token, $from, $to) = @_;
-        $html .= qq{<span class="$token">} . encode_entities(substr($code, $from, $to - $from)) . '</span>';
-    } $code;
+    sub highlight_code {
+        my ($code) = @_;
 
-    $html;
+        my $html = '';
+
+        perl_tokens {
+            my ($token, $from, $to) = @_;
+
+            my $substr = encode_entities(substr($code, $from, $to - $from));
+
+            if (exists($highlight_tokens{$token})) {
+                $html .= qq{<span class="$token">} . $substr . '</span>';
+            }
+            else {
+                $html .= $substr;
+            }
+        } $code;
+
+        $html;
+    }
 }
 
 sub report_src_line {
@@ -1651,7 +1667,7 @@ sub get_html_header {
     $title = _escape_html($title);
 
     my $html = <<EOD;
-    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+    <!DOCTYPE html>
     <html xmlns="http://www.w3.org/1999/xhtml">
 EOD
     $html = "<html>" if $opts->{not_xhtml};
