@@ -8,8 +8,6 @@ For the official version, please see:
 
 * https://github.com/timbunce/devel-nytprof
 
-[![Build Status](https://secure.travis-ci.org/timbunce/devel-nytprof.png)](http://travis-ci.org/timbunce/devel-nytprof)
-
 For more information see:
 
 * https://www.youtube.com/watch?v=T7EK6RZAnEA
@@ -30,4 +28,3 @@ To build and install, just incant the typical mantra:
      make
      make test
      make install
-

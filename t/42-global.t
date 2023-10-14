@@ -3,7 +3,7 @@ use warnings;
 # Tests CORE::GLOBAL::foo plus assorted data model methods
 
 use Test::More;
-use lib '/home/travis/perl5'; # travis workaround https://travis-ci.org/timbunce/devel-nytprof/jobs/35285944
+#use lib '/home/travis/perl5'; # travis workaround https://travis-ci.org/timbunce/devel-nytprof/jobs/35285944
 use Test::Differences;
 
 use lib qw(t/lib);
@@ -39,7 +39,7 @@ run_test_group( {
         is @fi, 1, 'should be 1 fileinfo';
         my $fid = $fi[0]->fid;
 
-        my @a; # ($file, $fid, $first, $last); 
+        my @a; # ($file, $fid, $first, $last);
         @a = $profile->file_line_range_of_sub($begin);
         is "$a[1] $a[2] $a[3]", "$fid 4 7", "details for $begin should match";
         @a = $profile->file_line_range_of_sub('main::RUNTIME');
@@ -84,4 +84,3 @@ BEGIN { # BEGIN@3
     *CORE::GLOBAL::sleep = \&foo;
 }
 sleep 1;
-
