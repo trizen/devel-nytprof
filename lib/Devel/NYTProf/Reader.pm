@@ -135,7 +135,7 @@ sub output_dir {
     my ($self, $dir) = @_;
     return $self->{output_dir} unless defined($dir);
     if (!mkdir $dir) {
-        confess "Unable to create directory $dir: $!\n" if !$! =~ /exists/;
+        confess "Unable to create directory $dir: $!\n" if !($! =~ /exists/);
     }
     $self->{output_dir} = $dir;
 }
@@ -517,7 +517,7 @@ sub _generate_report {
 
         my $separator_sub = $self->{mk_report_separator_line};
 
-        # iterate over xsubs 
+        # iterate over xsubs
         $line_sub = $self->{mk_report_xsub_line}
             or die "mk_report_xsub_line not set";
         my $subs_defined_in_file = $profile->subs_defined_in_file($filestr);
